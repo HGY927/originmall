@@ -9,8 +9,8 @@ import (
 )
 
 type UserServer struct {
-	Username     string `json:"username" validate:"min=2,max=10,required"`
-	Password     string `json:"password" validate:"min=6,max=20,required"`
+	Username     string `json:"username" validate:"required,min=2,max=10"`
+	Password     string `json:"password" validate:"required,min=6,max=20"`
 	Registertime int64  `json:"registertime"`
 	Logofftime   int64  `json:"logofftime"`
 }

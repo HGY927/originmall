@@ -3,21 +3,27 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"originmall/middleware/utils"
+	"originmall/reponse"
 	"originmall/server"
 )
 
 func UserController(w http.ResponseWriter, r *http.Request) {
-
-	userserver := &server.UserServer{
-		Username: r.FormValue("username"),
-		Password: r.FormValue("password"),
-	}
-	js, err := json.Marshal(server.Register(userserver))
+	var userserver server.UserServer
+	json.NewDecoder(r.Body).Decode(&userserver)
+	err := utils.CheckField(&userserver)
 	if err != nil {
-		w.Write([]byte("解析数据异常"))
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(reponse.ReponseMessge{
+			Code:    reponse.FILEDCHECKERR,
+			Message: "字段校验失败",
+			Data:    err.Error(),
+		})
+		return
 	}
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	w.Write(js)
+	json.NewEncoder(w).Encode(server.Register(&userserver))
 
 }
