@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"originmall/dao"
 	"originmall/moudle"
@@ -23,7 +22,9 @@ func Register(server *UserServer) reponse.ReponseMessge {
 		return res
 	}
 	server.setRegisterTime()
-	server.setHashPassword(server.Password)
+	if ok, res := server.setHashPassword(server.Password); ok {
+		return res
+	}
 	//组装dao
 	user := &moudle.User{
 		Username:     server.Username,
@@ -36,12 +37,19 @@ func Register(server *UserServer) reponse.ReponseMessge {
 
 }
 
-func (this *UserServer) setHashPassword(password string) {
+func (this *UserServer) setHashPassword(password string) (bool, reponse.ReponseMessge) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		fmt.Println("加密失败")
+		return false, reponse.ReponseMessge{
+			Code:    reponse.ENCODEPWDERR,
+			Message: "加密异常",
+		}
 	}
 	this.Password = string(hashPassword)
+	return true, reponse.ReponseMessge{
+		Code:    reponse.SUCCES,
+		Message: "加密成功",
+	}
 }
 
 func (this *UserServer) setRegisterTime() {
