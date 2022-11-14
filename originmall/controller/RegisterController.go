@@ -8,17 +8,17 @@ import (
 	"originmall/server"
 )
 
-func UserController(w http.ResponseWriter, r *http.Request) {
+func RegisterController(w http.ResponseWriter, r *http.Request) {
 	var userserver server.UserServer
 	json.NewDecoder(r.Body).Decode(&userserver)
-	err := utils.CheckField(&userserver)
-	if err != nil {
+	arr := utils.CheckField(&userserver)
+	if len(arr) != 0 {
 		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(reponse.ReponseMessge{
 			Code:    reponse.FILEDCHECKERR,
 			Message: "字段校验失败",
-			Data:    err.Error(),
+			Data:    json.Marshal(arr),
 		})
 		return
 	}

@@ -37,6 +37,12 @@ func Register(server *UserServer) reponse.ReponseMessge {
 
 }
 
+func Login(server *UserServer) reponse.ReponseMessge {
+	return reponse.ReponseMessge{}
+
+}
+
+// 密码加密
 func (this *UserServer) setHashPassword(password string) (bool, reponse.ReponseMessge) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
