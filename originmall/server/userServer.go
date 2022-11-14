@@ -22,7 +22,7 @@ func Register(server *UserServer) reponse.ReponseMessge {
 		return res
 	}
 	server.setRegisterTime()
-	if ok, res := server.setHashPassword(server.Password); ok {
+	if ok, res := server.setHashPassword(server.Password); !ok {
 		return res
 	}
 	//组装dao

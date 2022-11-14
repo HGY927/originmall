@@ -16,6 +16,8 @@ func UserController(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Write([]byte("解析数据异常"))
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	w.Write(js)
 
 }
