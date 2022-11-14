@@ -3,34 +3,44 @@ package dao
 import (
 	"originmall/middleware/utils"
 	"originmall/moudle"
+	"originmall/reponse"
 )
 
 var (
-	namesql   = "select username,pwd,registertime from user where username= ?"
+	namesql   = "select username from user where username= ?"
 	insertsql = "insert into user (username,pwd,registertime)values(?,?,?)"
 )
 
 // QueryUserByName 查询数据库中是否存在该用户名
-func QueryUserByName(username string) bool {
-
+func QueryUserByName(username string) (bool, reponse.ReponseMessge) {
+	var temp string
 	row := utils.Db.QueryRow(namesql, username)
-	user := moudle.User{}
-	row.Scan(&user.Username, &user.Password, &user.Registertime)
-	if user.Username == "" {
-		//fmt.Println("不存在用户名，可以注册")
-		return false
+	row.Scan(&temp)
+	if temp == "" {
+		return false, reponse.ReponseMessge{
+			Code:    reponse.INSERTUSER,
+			Message: "可以注册",
+		}
 	}
-	return true
+	return true, reponse.ReponseMessge{
+		Code:    reponse.REPEATUSER,
+		Message: "重复的用户名",
+	}
 }
 
 // CreateNewUser 新增用户
-func CreateNewUser(user *moudle.User) bool {
+func CreateNewUser(user *moudle.User) (bool, reponse.ReponseMessge) {
 
 	exact, _ := utils.Db.Exec(insertsql, user.Username, user.Password, user.Registertime)
 	isAdd, err := exact.RowsAffected()
 	if err != nil || isAdd == 0 {
-		//fmt.Println("新增用户异常失败", err)
-		return false
+		return false, reponse.ReponseMessge{
+			Code:    reponse.INSERTUSERERR,
+			Message: "新增用户异常失败",
+		}
 	}
-	return true
+	return true, reponse.ReponseMessge{
+		Code:    reponse.SUCCES,
+		Message: "新增用户成功",
+	}
 }
