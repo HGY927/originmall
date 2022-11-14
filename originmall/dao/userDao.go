@@ -4,6 +4,7 @@ import (
 	"originmall/middleware/utils"
 	"originmall/moudle"
 	"originmall/reponse"
+	"time"
 )
 
 var (
@@ -42,5 +43,6 @@ func CreateNewUser(user *moudle.User) (bool, reponse.ReponseMessge) {
 	return true, reponse.ReponseMessge{
 		Code:    reponse.SUCCES,
 		Message: "新增用户成功",
+		Data:    time.Unix(user.Registertime, 0).Format("2006-01-02 15:04:05"),
 	}
 }
