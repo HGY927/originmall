@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -14,13 +13,11 @@ type user struct {
 
 func TestValidate(t *testing.T) {
 	user := user{
-		Username: "",
-		Password: "124567",
+		Username: "1",
+		Password: "1",
 	}
 
-	arr := CheckField(user)
-	marshal, _ := json.Marshal(arr)
-	fmt.Println(string(marshal))
+	fmt.Println(CheckField(user))
 
 	//for k, v := range arr {
 	//	fmt.Println(k, v)

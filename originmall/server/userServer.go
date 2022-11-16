@@ -18,13 +18,19 @@ type UserServer struct {
 // Register 用户注册逻辑
 func Register(server *UserServer) reponse.ReponseMessge {
 
-	if ok, res := dao.QueryUserByName(server.Username); ok {
-		return res
+	if ok := dao.QueryUserByName(server.Username); ok {
+		return reponse.ReponseMessge{
+			Code:    reponse.REPEATUSER,
+			Message: "重复的用户名",
+		}
+	}
+	if ok := server.setHashPassword(server.Password); !ok {
+		return reponse.ReponseMessge{
+			Code:    reponse.ENCODEPWDERR,
+			Message: "加密异常",
+		}
 	}
 	server.setRegisterTime()
-	if ok, res := server.setHashPassword(server.Password); !ok {
-		return res
-	}
 	//组装dao
 	user := &moudle.User{
 		Username:     server.Username,
@@ -32,9 +38,17 @@ func Register(server *UserServer) reponse.ReponseMessge {
 		Registertime: server.Registertime,
 	}
 	//新增用户
-	_, res := dao.CreateNewUser(user)
-	return res
-
+	flag := dao.CreateNewUser(user)
+	if !flag {
+		return reponse.ReponseMessge{
+			Code:    reponse.INSERTUSERERR,
+			Message: "新增用户异常",
+		}
+	}
+	return reponse.ReponseMessge{
+		Code:    reponse.SUCCES,
+		Message: "新增用户成功",
+	}
 }
 
 func Login(server *UserServer) reponse.ReponseMessge {
@@ -43,19 +57,13 @@ func Login(server *UserServer) reponse.ReponseMessge {
 }
 
 // 密码加密
-func (this *UserServer) setHashPassword(password string) (bool, reponse.ReponseMessge) {
+func (this *UserServer) setHashPassword(password string) bool {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return false, reponse.ReponseMessge{
-			Code:    reponse.ENCODEPWDERR,
-			Message: "加密异常",
-		}
+		return false
 	}
 	this.Password = string(hashPassword)
-	return true, reponse.ReponseMessge{
-		Code:    reponse.SUCCES,
-		Message: "加密成功",
-	}
+	return true
 }
 
 func (this *UserServer) setRegisterTime() {

@@ -2,23 +2,25 @@ package utils
 
 import (
 	"github.com/go-playground/validator/v10"
+	"strings"
 )
 
-func CheckField(any interface{}) map[string]string {
+func CheckField(filed any) string {
 	validate := validator.New()
-	erred := validate.Struct(any)
-	Map := make(map[string]string, 10)
+	erred := validate.Struct(filed)
+	var str []string
 	if erred != nil {
 		for _, err := range erred.(validator.ValidationErrors) {
-			if err.ActualTag() == "min" {
-				Map[err.StructField()] = "输入的字符小于" + err.Param()
+			if err.ActualTag() == "required" {
+				str = append(str, err.StructField()+"字段不可为空")
+			} else if err.ActualTag() == "min" {
+				str = append(str, err.StructField()+"值不可小于"+err.Param())
 			} else if err.ActualTag() == "max" {
-				Map[err.StructField()] = "输入的字符大于" + err.Param()
-			} else if err.ActualTag() == "required" {
-				Map[err.StructField()] = "字段为必填"
+				str = append(str, err.StructField()+"值不可大于"+err.Param())
 			}
 		}
-		return Map
+
+		return strings.Join(str, ",")
 	}
-	return Map
+	return ""
 }

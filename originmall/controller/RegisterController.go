@@ -11,15 +11,13 @@ import (
 func RegisterController(w http.ResponseWriter, r *http.Request) {
 	var userserver server.UserServer
 	json.NewDecoder(r.Body).Decode(&userserver)
-	arr := utils.CheckField(&userserver)
-	if len(arr) != 0 {
+	str := utils.CheckField(&userserver)
+	if str != "" {
 		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 		w.WriteHeader(http.StatusInternalServerError)
-		err, _ := json.Marshal(arr)
 		json.NewEncoder(w).Encode(reponse.ReponseMessge{
 			Code:    reponse.FILEDCHECKERR,
-			Message: "字段校验失败",
-			Data:    string(err),
+			Message: str,
 		})
 		return
 	}
