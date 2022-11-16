@@ -1,12 +1,15 @@
 package dao
 
 import (
-	_ "originmall/middleware/utils"
+	"fmt"
+	_ "originmall/utils"
 	"testing"
 )
 
 func TestUser(t *testing.T) {
 
-	QueryUserByName("哈哈")
+	flag, ptr := QueryUserByName("何国洋")
+	fmt.Println(flag)
+	fmt.Println(*ptr)
 
 }

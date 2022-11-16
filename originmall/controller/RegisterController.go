@@ -3,9 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
-	"originmall/middleware/utils"
 	"originmall/reponse"
 	"originmall/server"
+	"originmall/utils"
 )
 
 func RegisterController(w http.ResponseWriter, r *http.Request) {

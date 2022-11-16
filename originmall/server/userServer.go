@@ -18,7 +18,7 @@ type UserServer struct {
 // Register 用户注册逻辑
 func Register(server *UserServer) reponse.ReponseMessge {
 
-	if ok := dao.QueryUserByName(server.Username); ok {
+	if ok, _ := dao.QueryUserByName(server.Username); ok {
 		return reponse.ReponseMessge{
 			Code:    reponse.REPEATUSER,
 			Message: "重复的用户名",
@@ -51,19 +51,34 @@ func Register(server *UserServer) reponse.ReponseMessge {
 	}
 }
 
+// Login 登录用户逻辑
 func Login(server *UserServer) reponse.ReponseMessge {
-	return reponse.ReponseMessge{}
+
+	ok, user := dao.QueryUserByName(server.Username)
+	if !ok || !server.checkUserPassword(user, server.Password) {
+		return reponse.ReponseMessge{
+			Code:    reponse.NOTCORRECTUSERNAMEORPASSWORD,
+			Message: "用户名或者密码不正确",
+		}
+	}
+	return reponse.ReponseMessge{
+		Code:    reponse.SUCCES,
+		Message: "登录成功",
+	}
 
 }
 
 // 密码加密
 func (this *UserServer) setHashPassword(password string) bool {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return false
-	}
 	this.Password = string(hashPassword)
-	return true
+	return err == nil
+}
+
+// 校验密码
+func (this *UserServer) checkUserPassword(user *moudle.User, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	return err == nil
 }
 
 func (this *UserServer) setRegisterTime() {
