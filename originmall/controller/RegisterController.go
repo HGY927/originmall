@@ -9,8 +9,9 @@ import (
 )
 
 func RegisterController(w http.ResponseWriter, r *http.Request) {
-	var userserver *server.UserServer
-	json.NewDecoder(r.Body).Decode(&userserver)
+	userserver := &server.UserServer{}
+	userserver.Username = r.FormValue("username")
+	userserver.Password = r.FormValue("password")
 	str := utils.CheckField(userserver)
 	if str != "" {
 		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
@@ -24,5 +25,4 @@ func RegisterController(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(server.Register(userserver))
-
 }

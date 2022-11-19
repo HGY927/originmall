@@ -53,7 +53,6 @@ func Register(server *UserServer) reponse.ReponseMessge {
 
 // Login 登录用户逻辑
 func Login(server *UserServer) reponse.ReponseMessge {
-
 	ok, user := dao.QueryUserByName(server.Username)
 	if !ok || !server.checkUserPassword(user, server.Password) {
 		return reponse.ReponseMessge{
@@ -64,7 +63,13 @@ func Login(server *UserServer) reponse.ReponseMessge {
 	return reponse.ReponseMessge{
 		Code:    reponse.SUCCES,
 		Message: "登录成功",
+		Data:    user.Registertime,
 	}
+
+}
+
+// 修改用户名
+func UpdateName() {
 
 }
 
